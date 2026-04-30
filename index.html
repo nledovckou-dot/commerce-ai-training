@@ -8,6 +8,7 @@
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
   <link href="https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@400;500;700&display=swap" rel="stylesheet">
   <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;700;800;900&display=swap" rel="stylesheet">
+  <link href="https://fonts.googleapis.com/css2?family=Geologica:wght@400;500;700;800;900&display=swap" rel="stylesheet">
   <style>
     :root {
       --bg: #1C1A1C;
@@ -26,7 +27,7 @@
       --neutral-gray: #858585;
       --neutral-gray-light: #C8C8C8;
 
-      --font-primary: "Inter", "YS Geo", Arial, Helvetica, sans-serif;
+      --font-primary: "YS Geo", "Geologica", "Inter", Arial, Helvetica, sans-serif;
       --font-mono: "JetBrains Mono", Menlo, monospace;
 
       --slide-w: 1920px;
@@ -46,6 +47,9 @@
       overflow: hidden;
       height: 100vh;
       width: 100vw;
+      -webkit-font-smoothing: antialiased;
+      -moz-osx-font-smoothing: grayscale;
+      text-rendering: optimizeLegibility;
     }
 
     .deck {
