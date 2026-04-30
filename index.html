@@ -114,50 +114,41 @@
     }
 
     /* ===== SLIDE 01 — COVER ===== */
-    .slide--cover { display: grid; grid-template-rows: 1fr auto; }
+    .slide--cover {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      align-items: stretch;
+      gap: 64px;
+      padding-top: 180px;
+      padding-bottom: 96px;
+    }
+    .slide--cover .cover-text {
+      display: grid;
+      grid-template-rows: 1fr auto;
+      gap: 32px;
+    }
     .slide--cover .cover-title {
-      align-self: end;
-      font-size: 92px;
+      align-self: start;
+      font-size: 96px;
       font-weight: 900;
       line-height: 0.98;
       letter-spacing: -1.5px;
-      max-width: 1000px;
-      position: relative;
-      z-index: 5;
+      max-width: 760px;
     }
     .slide--cover .cover-authors {
+      align-self: end;
       font-family: var(--font-mono);
       font-size: 14px;
       letter-spacing: 1px;
       color: var(--text-secondary);
-      margin-top: 48px;
-      border-top: 1px solid var(--neutral-gray);
-      padding-top: 24px;
-      width: 480px;
-      position: relative;
-      z-index: 5;
     }
     .slide--cover .cover-accent {
-      position: absolute;
-      top: 0;
-      right: 0;
-      width: 760px;
-      height: 100%;
+      align-self: stretch;
       background-image: url('cover-key.png');
       background-size: cover;
-      background-position: center right;
+      background-position: center;
       background-repeat: no-repeat;
-      z-index: 1;
-    }
-    .slide--cover .cover-accent::before {
-      content: "";
-      position: absolute;
-      top: 0;
-      left: 0;
-      width: 240px;
-      height: 100%;
-      background: linear-gradient(90deg, var(--bg), rgba(28,26,28,0));
-      pointer-events: none;
+      border-radius: 24px;
     }
 
     /* ===== SLIDE 02 — AGENDA ===== */
@@ -740,9 +731,11 @@
     <!-- 01 — COVER -->
     <section class="slide is-active slide--cover" data-index="01">
       <div class="brand">auto.ru бизнес</div>
+      <div class="cover-text">
+        <h1 class="cover-title">AI как управляемый исполнитель</h1>
+        <div class="cover-authors">Обучение для команды коммерции · 30 апреля 2026</div>
+      </div>
       <div class="cover-accent"></div>
-      <h1 class="cover-title">AI как управляемый исполнитель</h1>
-      <div class="cover-authors">Обучение для команды коммерции · 30 апреля 2026</div>
       <div class="page-number">01 / 18</div>
     </section>
 
