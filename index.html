@@ -1,0 +1,1544 @@
+<!doctype html>
+<html lang="ru">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>AI как управляемый исполнитель — Обучение для коммерции</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@400;500;700&display=swap" rel="stylesheet">
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;700;800;900&display=swap" rel="stylesheet">
+  <style>
+    :root {
+      --bg: #1C1A1C;
+      --bg-dark: #151415;
+      --card: #2A272A;
+      --card-hover: #333033;
+      --text: #FFFFFF;
+      --text-secondary: #9E9E9E;
+      --text-muted: #6B6B6B;
+      --accent-red: #E60000;
+      --accent-blue: #3838E5;
+      --accent-orange: #FFB445;
+      --accent-green: #3DB86A;
+      --accent-beige: #DBD0C3;
+      --accent-beige-dark: #B9AB9B;
+      --neutral-gray: #858585;
+      --neutral-gray-light: #C8C8C8;
+
+      --font-primary: "Inter", "YS Geo", Arial, Helvetica, sans-serif;
+      --font-mono: "JetBrains Mono", Menlo, monospace;
+
+      --slide-w: 1920px;
+      --slide-h: 1080px;
+      --slide-pad-y: 48px;
+      --slide-pad-x: 64px;
+      --card-radius: 16px;
+    }
+
+    * { box-sizing: border-box; margin: 0; padding: 0; }
+
+    html, body {
+      background: var(--bg);
+      color: var(--text);
+      font-family: var(--font-primary);
+      font-weight: 400;
+      overflow: hidden;
+      height: 100vh;
+      width: 100vw;
+    }
+
+    .deck {
+      position: relative;
+      width: 100vw;
+      height: 100vh;
+      overflow: hidden;
+    }
+
+    .slide {
+      position: absolute;
+      top: 50%;
+      left: 50%;
+      width: var(--slide-w);
+      height: var(--slide-h);
+      margin-left: -960px;
+      margin-top: -540px;
+      padding: var(--slide-pad-y) var(--slide-pad-x);
+      background: var(--bg);
+      transform-origin: center center;
+      transform: scale(min(calc(100vw / 1920px), calc(100vh / 1080px)));
+      overflow: hidden;
+    }
+
+    .slide:not(.is-active) { display: none !important; }
+
+    .brand {
+      position: absolute;
+      top: 48px;
+      left: 64px;
+      font-weight: 900;
+      font-size: 28px;
+      letter-spacing: -0.5px;
+      color: var(--text);
+      text-transform: lowercase;
+      z-index: 10;
+    }
+
+    .page-number {
+      position: absolute;
+      bottom: 48px;
+      right: 64px;
+      font-family: var(--font-mono);
+      font-size: 13px;
+      color: var(--text-secondary);
+      letter-spacing: 1px;
+      z-index: 10;
+    }
+
+    .deck-link {
+      color: var(--accent-beige);
+      text-decoration: underline;
+      text-underline-offset: 4px;
+      text-decoration-thickness: 1px;
+      transition: color 0.15s;
+    }
+    .deck-link:hover { color: var(--text); }
+
+    .nav-category {
+      font-family: var(--font-mono);
+      font-size: 12px;
+      font-weight: 700;
+      letter-spacing: 3px;
+      color: var(--text-secondary);
+      text-transform: uppercase;
+    }
+
+    /* ===== SLIDE 01 — COVER ===== */
+    .slide--cover { display: grid; grid-template-rows: 1fr auto; }
+    .slide--cover .cover-title {
+      align-self: end;
+      font-size: 92px;
+      font-weight: 900;
+      line-height: 0.98;
+      letter-spacing: -1.5px;
+      max-width: 1000px;
+      position: relative;
+      z-index: 5;
+    }
+    .slide--cover .cover-authors {
+      font-family: var(--font-mono);
+      font-size: 14px;
+      letter-spacing: 1px;
+      color: var(--text-secondary);
+      margin-top: 48px;
+      border-top: 1px solid var(--neutral-gray);
+      padding-top: 24px;
+      width: 480px;
+      position: relative;
+      z-index: 5;
+    }
+    .slide--cover .cover-accent {
+      position: absolute;
+      top: 0;
+      right: 0;
+      width: 760px;
+      height: 100%;
+      background-image: url('cover-key.png');
+      background-size: cover;
+      background-position: center right;
+      background-repeat: no-repeat;
+      z-index: 1;
+    }
+    .slide--cover .cover-accent::before {
+      content: "";
+      position: absolute;
+      top: 0;
+      left: 0;
+      width: 240px;
+      height: 100%;
+      background: linear-gradient(90deg, var(--bg), rgba(28,26,28,0));
+      pointer-events: none;
+    }
+
+    /* ===== SLIDE 02 — AGENDA ===== */
+    .slide--agenda {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      align-items: start;
+      gap: 64px;
+      padding-top: 180px;
+    }
+    .slide--agenda .agenda-heading {
+      font-size: 56px;
+      font-weight: 900;
+      line-height: 1;
+      letter-spacing: -0.5px;
+      margin-top: 24px;
+    }
+    .slide--agenda .agenda-list {
+      list-style: none;
+      display: grid;
+      gap: 0;
+      align-self: start;
+    }
+    .slide--agenda .agenda-list li {
+      display: grid;
+      grid-template-columns: 80px 1fr;
+      align-items: baseline;
+      padding: 28px 0;
+      border-bottom: 1px solid var(--neutral-gray);
+      font-size: 28px;
+      font-weight: 700;
+    }
+    .slide--agenda .agenda-list li:first-child {
+      border-top: 1px solid var(--neutral-gray);
+    }
+    .slide--agenda .agenda-num {
+      font-family: var(--font-mono);
+      color: var(--accent-beige);
+      font-size: 18px;
+      font-weight: 400;
+    }
+
+    /* ===== SECTION DIVIDERS (03, 05, 09, 11) ===== */
+    .slide--section { display: grid; grid-template-rows: 1fr auto; align-items: end; padding-bottom: 120px; }
+    .slide--section .section-category {
+      font-family: var(--font-mono);
+      font-size: 12px;
+      font-weight: 700;
+      letter-spacing: 3px;
+      color: var(--accent-beige);
+      text-transform: uppercase;
+      margin-bottom: 32px;
+    }
+    .slide--section .section-heading {
+      font-size: 200px;
+      font-weight: 900;
+      line-height: 0.92;
+      letter-spacing: -3px;
+      color: var(--text);
+      max-width: 1600px;
+    }
+    .slide--section .section-footer {
+      position: absolute;
+      bottom: 48px;
+      left: 64px;
+      font-size: 14px;
+      color: var(--text-secondary);
+      display: flex;
+      gap: 16px;
+      align-items: center;
+    }
+
+    /* ===== SLIDE 06 — PRD INTRO ===== */
+    .slide--prd-intro { display: grid; grid-template-rows: auto auto auto auto auto 1fr; padding-top: 180px; gap: 16px; }
+    .slide--prd-intro .prd-decoder {
+      margin-top: 16px;
+      display: flex;
+      flex-wrap: wrap;
+      align-items: baseline;
+      gap: 16px;
+      font-family: var(--font-mono);
+    }
+    .slide--prd-intro .prd-decoder-letter {
+      font-size: 88px;
+      font-weight: 700;
+      color: var(--accent-beige);
+      letter-spacing: -2px;
+      line-height: 1;
+    }
+    .slide--prd-intro .prd-decoder-word {
+      font-size: 36px;
+      font-weight: 400;
+      color: var(--text-secondary);
+      letter-spacing: -0.5px;
+      margin-right: 32px;
+      line-height: 1;
+    }
+    .slide--prd-intro .prd-heading {
+      font-size: 56px;
+      font-weight: 900;
+      line-height: 1;
+      letter-spacing: -0.5px;
+      margin-top: 16px;
+      max-width: 1400px;
+    }
+    .slide--prd-intro .prd-description {
+      font-size: 20px;
+      line-height: 1.55;
+      color: var(--text-secondary);
+      max-width: 1400px;
+      margin-top: 12px;
+    }
+    .slide--prd-intro .prd-pillars {
+      display: grid;
+      grid-template-columns: repeat(4, 1fr);
+      gap: 20px;
+      margin-top: 32px;
+      align-content: start;
+    }
+    .slide--prd-intro .prd-pillar {
+      background: var(--card);
+      border-radius: var(--card-radius);
+      padding: 28px 32px;
+      display: grid;
+      grid-template-rows: auto auto 1fr;
+      gap: 14px;
+      min-height: 220px;
+    }
+    .slide--prd-intro .pillar-num {
+      font-family: var(--font-mono);
+      font-size: 13px;
+      color: var(--accent-beige);
+      letter-spacing: 1px;
+    }
+    .slide--prd-intro .pillar-title {
+      font-size: 24px;
+      font-weight: 900;
+      line-height: 1;
+      letter-spacing: -0.3px;
+    }
+    .slide--prd-intro .pillar-desc {
+      font-size: 15px;
+      line-height: 1.5;
+      color: var(--text-secondary);
+    }
+    .slide--prd-intro .prd-intro-footer {
+      position: absolute;
+      bottom: 48px;
+      left: 64px;
+      display: flex;
+      gap: 12px;
+      font-size: 14px;
+      color: var(--text-muted);
+    }
+
+    /* ===== SLIDES 07–10 — PROMPT ===== */
+    .slide--prompt { display: grid; grid-template-rows: auto auto auto 1fr auto; padding-top: 140px; gap: 12px; }
+    .slide--prompt .prompt-num {
+      font-family: var(--font-mono);
+      font-size: 12px;
+      letter-spacing: 3px;
+      text-transform: uppercase;
+      color: var(--accent-beige);
+      margin-top: 12px;
+    }
+    .slide--prompt .prompt-heading {
+      font-size: 48px;
+      font-weight: 900;
+      line-height: 1;
+      letter-spacing: -0.5px;
+      margin-top: 4px;
+    }
+    .slide--prompt .prompt-preview {
+      position: relative;
+      background: var(--card);
+      border-radius: var(--card-radius);
+      padding: 28px 32px;
+      margin-top: 16px;
+      max-height: 440px;
+      overflow: hidden;
+    }
+    .slide--prompt .prompt-text {
+      font-family: var(--font-mono);
+      font-size: 13px;
+      line-height: 1.6;
+      color: var(--text);
+      white-space: pre-wrap;
+      margin: 0;
+    }
+    .slide--prompt .prompt-fade {
+      position: absolute;
+      left: 0; right: 0; bottom: 0;
+      height: 200px;
+      background: linear-gradient(180deg, rgba(42,39,42,0) 0%, var(--card) 65%);
+      pointer-events: none;
+    }
+    .slide--prompt .prompt-actions {
+      display: flex;
+      align-items: center;
+      gap: 20px;
+      margin-top: 16px;
+    }
+    .slide--prompt .prompt-copy {
+      background: var(--accent-beige);
+      color: var(--bg);
+      border: 0;
+      padding: 14px 28px;
+      border-radius: 999px;
+      font-family: var(--font-primary);
+      font-weight: 700;
+      font-size: 15px;
+      letter-spacing: -0.2px;
+      cursor: pointer;
+      transition: background 0.15s, color 0.15s;
+    }
+    .slide--prompt .prompt-copy:hover { background: var(--accent-beige-dark); }
+    .slide--prompt .prompt-copy.is-copied { background: var(--accent-green); color: var(--text); }
+    .slide--prompt .prompt-meta {
+      font-family: var(--font-mono);
+      font-size: 13px;
+      color: var(--text-muted);
+      letter-spacing: 0.5px;
+    }
+    .slide--prompt .prompt-explanation {
+      font-size: 17px;
+      line-height: 1.55;
+      color: var(--text-secondary);
+      max-width: 1500px;
+      margin-top: 12px;
+    }
+    .slide--prompt .prompt-explanation strong { color: var(--text); font-weight: 700; }
+
+    /* ===== FEATURE WITH SCREENSHOT (04, 12, 15) ===== */
+    .slide--feature {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      grid-template-rows: auto auto auto 1fr auto;
+      gap: 16px 64px;
+      padding-top: 180px;
+    }
+    .slide--feature .nav-category { grid-column: 1 / -1; }
+    .slide--feature .feature-heading {
+      grid-column: 1 / -1;
+      font-size: 56px;
+      font-weight: 900;
+      line-height: 1;
+      letter-spacing: -0.5px;
+      max-width: 1200px;
+      margin-top: 8px;
+    }
+    .slide--feature .feature-description {
+      grid-column: 1 / -1;
+      font-size: 20px;
+      line-height: 1.4;
+      color: var(--text-secondary);
+      max-width: 1100px;
+      margin-top: 8px;
+      margin-bottom: 16px;
+    }
+    .slide--feature .feature-points {
+      grid-column: 1;
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 16px;
+      align-content: start;
+    }
+    .slide--feature .feature-point {
+      background: var(--card);
+      border-radius: var(--card-radius);
+      padding: 22px 26px;
+      display: grid;
+      grid-template-rows: auto auto auto;
+      gap: 10px;
+      min-height: 168px;
+    }
+    .slide--feature .point-num {
+      font-family: var(--font-mono);
+      font-size: 12px;
+      color: var(--accent-beige);
+      letter-spacing: 1px;
+    }
+    .slide--feature .point-title {
+      font-size: 22px;
+      font-weight: 900;
+      line-height: 1.1;
+      letter-spacing: -0.3px;
+    }
+    .slide--feature .point-desc {
+      font-size: 14px;
+      line-height: 1.5;
+      color: var(--text-secondary);
+    }
+    .slide--feature .feature-mock {
+      grid-column: 2;
+      background: var(--bg-dark);
+      border-radius: var(--card-radius);
+      border: 1px solid var(--neutral-gray);
+      padding: 28px 32px;
+      display: grid;
+      grid-template-rows: auto 1fr;
+      gap: 16px;
+      align-self: stretch;
+    }
+    .slide--feature .mock-bar {
+      display: flex;
+      gap: 8px;
+      align-items: center;
+      padding-bottom: 12px;
+      border-bottom: 1px solid var(--neutral-gray);
+    }
+    .slide--feature .mock-dot {
+      width: 12px;
+      height: 12px;
+      border-radius: 50%;
+      background: var(--neutral-gray);
+    }
+    .slide--feature .mock-dot:nth-child(1) { background: var(--accent-red); }
+    .slide--feature .mock-dot:nth-child(2) { background: var(--accent-orange); }
+    .slide--feature .mock-dot:nth-child(3) { background: var(--accent-green); }
+    .slide--feature .mock-content {
+      font-family: var(--font-mono);
+      font-size: 14px;
+      color: var(--text-secondary);
+      line-height: 1.7;
+      white-space: pre-wrap;
+    }
+    .slide--feature .mock-content strong { color: var(--accent-beige); font-weight: 700; }
+    .slide--feature .mock-content em { color: var(--accent-green); font-style: normal; }
+    .slide--feature .feature-footer {
+      grid-column: 1 / -1;
+      display: flex;
+      gap: 24px;
+      flex-wrap: wrap;
+      font-size: 14px;
+      color: var(--text-muted);
+      margin-top: 20px;
+    }
+
+    /* Wide variant: 4 points across full width, no mock */
+    .slide--feature.is-wide .feature-points {
+      grid-column: 1 / -1;
+      grid-template-columns: repeat(2, 1fr);
+      gap: 20px;
+    }
+    .slide--feature.is-wide .feature-point {
+      min-height: 200px;
+      padding: 28px 32px;
+    }
+    .slide--feature.is-wide .point-title { font-size: 24px; }
+    .slide--feature.is-wide .point-desc { font-size: 16px; line-height: 1.55; }
+    .slide--feature.is-wide .point-example {
+      font-family: var(--font-mono);
+      font-size: 13px;
+      line-height: 1.5;
+      color: var(--accent-beige);
+      margin-top: 4px;
+    }
+    .slide--feature.is-wide .point-example::before {
+      content: "Пример → ";
+      color: var(--text-muted);
+    }
+
+    /* ===== SLIDE — REPOS GALLERY ===== */
+    .slide--repos {
+      display: grid;
+      grid-template-rows: auto auto auto 1fr auto;
+      gap: 14px;
+      padding-top: 180px;
+    }
+    .slide--repos .repos-heading {
+      font-size: 56px;
+      font-weight: 900;
+      line-height: 1;
+      letter-spacing: -0.5px;
+      margin-top: 8px;
+      max-width: 1400px;
+    }
+    .slide--repos .repos-description {
+      font-size: 20px;
+      line-height: 1.45;
+      color: var(--text-secondary);
+      max-width: 1300px;
+      margin-top: 4px;
+      margin-bottom: 16px;
+    }
+    .slide--repos .repos-grid {
+      display: grid;
+      grid-template-columns: repeat(3, 1fr);
+      grid-auto-rows: 1fr;
+      gap: 18px;
+      align-content: start;
+    }
+    .slide--repos .repo-card {
+      background: var(--card);
+      border-radius: var(--card-radius);
+      padding: 24px 28px;
+      display: grid;
+      grid-template-rows: auto auto 1fr auto;
+      gap: 8px;
+      transition: background 0.15s;
+      text-decoration: none;
+      color: inherit;
+    }
+    .slide--repos .repo-card:hover { background: var(--card-hover); }
+    .slide--repos .repo-handle {
+      font-family: var(--font-mono);
+      font-size: 13px;
+      color: var(--accent-beige);
+      letter-spacing: 0.5px;
+    }
+    .slide--repos .repo-title {
+      font-size: 24px;
+      font-weight: 900;
+      line-height: 1.1;
+      letter-spacing: -0.3px;
+    }
+    .slide--repos .repo-desc {
+      font-size: 14px;
+      line-height: 1.5;
+      color: var(--text-secondary);
+    }
+    .slide--repos .repo-meta {
+      font-family: var(--font-mono);
+      font-size: 12px;
+      color: var(--text-muted);
+      letter-spacing: 0.5px;
+      display: flex;
+      gap: 12px;
+      align-items: center;
+      padding-top: 8px;
+      border-top: 1px solid var(--neutral-gray);
+    }
+    .slide--repos .repo-meta strong {
+      color: var(--accent-green);
+      font-weight: 700;
+    }
+    .slide--repos .repos-footer {
+      display: flex;
+      gap: 24px;
+      flex-wrap: wrap;
+      font-size: 14px;
+      color: var(--text-muted);
+      margin-top: 12px;
+    }
+
+    /* ===== SLIDE 12 — COMPARE ===== */
+    .slide--compare { display: grid; grid-template-rows: auto auto auto auto 1fr; padding-top: 180px; }
+    .slide--compare .compare-category {
+      font-family: var(--font-mono);
+      font-size: 12px;
+      font-weight: 700;
+      letter-spacing: 3px;
+      color: var(--accent-beige);
+      text-transform: uppercase;
+      margin-top: 16px;
+    }
+    .slide--compare .compare-heading {
+      font-size: 56px;
+      font-weight: 900;
+      line-height: 1;
+      letter-spacing: -0.5px;
+      margin-top: 24px;
+      max-width: 1400px;
+    }
+    .slide--compare .compare-grid {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 24px;
+      margin-top: 56px;
+      align-content: start;
+    }
+    .slide--compare .compare-col {
+      background: var(--card);
+      border-radius: var(--card-radius);
+      padding: 40px 44px;
+      display: grid;
+      grid-template-rows: auto auto auto 1fr auto;
+      gap: 20px;
+      min-height: 460px;
+    }
+    .slide--compare .col-label {
+      font-family: var(--font-mono);
+      font-size: 12px;
+      letter-spacing: 2px;
+      color: var(--accent-beige);
+      text-transform: uppercase;
+    }
+    .slide--compare .col-title {
+      font-size: 88px;
+      font-weight: 900;
+      line-height: 0.95;
+      letter-spacing: -2px;
+    }
+    .slide--compare .col-desc {
+      font-size: 18px;
+      line-height: 1.5;
+      color: var(--text-secondary);
+    }
+    .slide--compare .col-when {
+      font-size: 15px;
+      line-height: 1.5;
+      color: var(--text);
+      border-top: 1px solid var(--neutral-gray);
+      padding-top: 18px;
+      align-self: end;
+    }
+    .slide--compare .col-when strong { color: var(--accent-beige); font-weight: 700; }
+    .slide--compare .compare-footer {
+      position: absolute;
+      bottom: 48px;
+      left: 64px;
+      display: flex;
+      gap: 24px;
+      flex-wrap: wrap;
+      font-size: 14px;
+    }
+
+    /* ===== SLIDE 14 — DISCUSS ===== */
+    .slide--discuss { display: grid; grid-template-rows: 1fr auto; align-items: center; padding-bottom: 120px; }
+    .slide--discuss .discuss-heading {
+      align-self: center;
+      font-size: 160px;
+      font-weight: 900;
+      line-height: 0.95;
+      letter-spacing: -3px;
+      max-width: 1600px;
+    }
+    .slide--discuss .discuss-meta {
+      font-family: var(--font-mono);
+      font-size: 14px;
+      color: var(--text-secondary);
+      letter-spacing: 1px;
+      border-top: 1px solid var(--neutral-gray);
+      padding-top: 24px;
+      width: 480px;
+    }
+
+    /* ===== HINT ===== */
+    .deck-hint {
+      position: fixed;
+      bottom: 16px;
+      left: 50%;
+      transform: translateX(-50%);
+      font-family: var(--font-mono);
+      font-size: 11px;
+      color: var(--text-muted);
+      background: rgba(21, 20, 21, 0.8);
+      padding: 6px 14px;
+      border-radius: 8px;
+      letter-spacing: 1px;
+      z-index: 100;
+      pointer-events: none;
+      opacity: 0.7;
+    }
+
+    /* ===== PRINT ===== */
+    @media print {
+      @page { size: 1920px 1080px; margin: 0; }
+      html, body { overflow: visible; background: var(--bg); height: auto; width: auto; }
+      .deck { position: static; width: auto; height: auto; overflow: visible; }
+      .slide {
+        display: block !important;
+        position: static !important;
+        top: auto;
+        left: auto;
+        width: var(--slide-w);
+        height: var(--slide-h);
+        transform: none !important;
+        page-break-after: always;
+        page-break-inside: avoid;
+      }
+      .slide:last-child { page-break-after: auto; }
+      .deck-hint { display: none; }
+    }
+  </style>
+</head>
+<body>
+  <main class="deck">
+
+    <!-- 01 — COVER -->
+    <section class="slide is-active slide--cover" data-index="01">
+      <div class="brand">auto.ru бизнес</div>
+      <div class="cover-accent"></div>
+      <h1 class="cover-title">AI как управляемый исполнитель</h1>
+      <div class="cover-authors">Обучение для команды коммерции · 30 апреля 2026</div>
+      <div class="page-number">01 / 18</div>
+    </section>
+
+    <!-- 02 — AGENDA -->
+    <section class="slide slide--agenda" data-index="02">
+      <div class="brand">auto.ru бизнес</div>
+      <div>
+        <div class="nav-category">Auto.ru бизнес</div>
+        <h2 class="agenda-heading">Содержание</h2>
+      </div>
+      <ol class="agenda-list">
+        <li><span class="agenda-num">01</span><span>Скилл АРБ</span></li>
+        <li><span class="agenda-num">02</span><span>Методология PRD</span></li>
+        <li><span class="agenda-num">03</span><span>GitHub</span></li>
+        <li><span class="agenda-num">04</span><span>API и MCP</span></li>
+      </ol>
+      <div class="page-number">02 / 18</div>
+    </section>
+
+    <!-- 03 — SECTION I -->
+    <section class="slide slide--section" data-index="03">
+      <div class="brand">auto.ru бизнес</div>
+      <div>
+        <div class="section-category">Часть I</div>
+        <h1 class="section-heading">Скилл АРБ</h1>
+      </div>
+      <div class="page-number">03 / 18</div>
+    </section>
+
+    <!-- 04 — FEATURE: ARB SKILL -->
+    <section class="slide slide--feature" data-index="04">
+      <div class="brand">auto.ru бизнес</div>
+      <div class="nav-category">Скилл АРБ</div>
+      <h2 class="feature-heading">Презентация за минуту</h2>
+      <p class="feature-description">Эта колода сгенерирована скиллом АРБ. Бренд auto.ru Бизнес — 1 к 1.</p>
+      <div class="feature-points">
+        <div class="feature-point">
+          <div class="point-num">01</div>
+          <div class="point-title">Колода 16:9 за минуту</div>
+          <div class="point-desc">Брифа из пяти полей хватает.</div>
+        </div>
+        <div class="feature-point">
+          <div class="point-num">02</div>
+          <div class="point-title">Бренд 1 к 1</div>
+          <div class="point-desc">Палитра, шрифты, layouts из мастер-шаблона.</div>
+        </div>
+        <div class="feature-point">
+          <div class="point-num">03</div>
+          <div class="point-title">Tone of Voice</div>
+          <div class="point-desc">Валидатор режет эмодзи и канцелярит.</div>
+        </div>
+        <div class="feature-point">
+          <div class="point-num">04</div>
+          <div class="point-title">Редактируется в PowerPoint</div>
+          <div class="point-desc">Файл .pptx, правки руками без потерь.</div>
+        </div>
+      </div>
+      <div class="feature-mock">
+        <div class="mock-bar">
+          <div class="mock-dot"></div><div class="mock-dot"></div><div class="mock-dot"></div>
+        </div>
+<div class="mock-content">$ python build_pptx.py deck.json
+<strong>→</strong> Reading brand/tokens.json
+<strong>→</strong> Reading brand/voice.md
+<strong>→</strong> Validating 14 slides
+<strong>→</strong> Voice OK · 0 violations
+<strong>→</strong> Building from arb-master.pptx
+<strong>→</strong> Output: presentation.pptx
+<em>✓ Done in 47s</em></div>
+      </div>
+      <div class="feature-footer">
+        <span>Скилл</span>
+        <a class="deck-link" href="arb-skill.zip" download>arb-skill.zip · 100 МБ</a>
+        <span>·</span>
+        <a class="deck-link" href="file:///Users/n-a-ledovskoy/.claude/skills/arb/SKILL.md" target="_blank" rel="noopener">SKILL.md</a>
+      </div>
+      <div class="page-number">04 / 18</div>
+    </section>
+
+    <!-- 05 — SECTION II -->
+    <section class="slide slide--section" data-index="05">
+      <div class="brand">auto.ru бизнес</div>
+      <div>
+        <div class="section-category">Часть II</div>
+        <h1 class="section-heading">Методология PRD</h1>
+      </div>
+      <div class="section-footer">
+        <span>Источник методологии:</span>
+        <a class="deck-link" href="https://t.me/ris_ai" target="_blank" rel="noopener">t.me/ris_ai</a>
+      </div>
+      <div class="page-number">05 / 18</div>
+    </section>
+
+    <!-- 06 — PRD INTRO -->
+    <section class="slide slide--prd-intro" data-index="06">
+      <div class="brand">auto.ru бизнес</div>
+      <div class="nav-category">PRD</div>
+      <div class="prd-decoder">
+        <span class="prd-decoder-letter">P</span><span class="prd-decoder-word">roduct</span>
+        <span class="prd-decoder-letter">R</span><span class="prd-decoder-word">equirements</span>
+        <span class="prd-decoder-letter">D</span><span class="prd-decoder-word">ocument</span>
+      </div>
+      <h2 class="prd-heading">Документ требований к продукту</h2>
+      <p class="prd-description">Структурированный текст, который читает и человек, и AI-агент. Берётся сырьё — голосовые, переписка, ограничения, идея. На выходе — карта проекта с целями, юзерами, архитектурой, тестами и acceptance criteria. AI получает чёткую базу вместо «допиши что нужно».</p>
+      <div class="prd-pillars">
+        <div class="prd-pillar">
+          <div class="pillar-num">01</div>
+          <div class="pillar-title">Цели и не-цели</div>
+          <div class="pillar-desc">Что делаем в v1 и что сознательно не делаем.</div>
+        </div>
+        <div class="prd-pillar">
+          <div class="pillar-num">02</div>
+          <div class="pillar-title">Юзеры и сценарии</div>
+          <div class="pillar-desc">Персоны, JTBD, ключевые user stories.</div>
+        </div>
+        <div class="prd-pillar">
+          <div class="pillar-num">03</div>
+          <div class="pillar-title">Архитектура</div>
+          <div class="pillar-desc">Подсистемы, контракты, потоки, безопасность.</div>
+        </div>
+        <div class="prd-pillar">
+          <div class="pillar-num">04</div>
+          <div class="pillar-title">Acceptance</div>
+          <div class="pillar-desc">Тесты и критерий «v1 реально готов».</div>
+        </div>
+      </div>
+      <div class="prd-intro-footer">
+        <span>Источник методологии</span>
+        <a class="deck-link" href="https://t.me/ris_ai" target="_blank" rel="noopener">t.me/ris_ai</a>
+      </div>
+      <div class="page-number">06 / 18</div>
+    </section>
+
+    <!-- 07 — PROMPT 1: PRD -->
+    <section class="slide slide--prompt" data-index="07">
+      <div class="brand">auto.ru бизнес</div>
+      <div class="nav-category">Этап PRD</div>
+      <div class="prompt-num">Промпт 1 из 4</div>
+      <h2 class="prompt-heading">Генерация PRD из сырья</h2>
+      <div class="prompt-preview">
+        <pre class="prompt-text" id="prompt-1-text">Ты — сильный product architect + tech lead + systems designer.
+Твоя задача — превратить сырой материал в рабочий PRD, который
+можно сразу отдать AI-агенту на разработку.
+
+Контекст проекта:
+- Название: [PRODUCT_NAME]
+- Тип продукта: [PRODUCT_TYPE]
+- Целевая аудитория: [TARGET_USERS]
+- Цели: [GOALS]
+- Ограничения: [CONSTRAINTS]
+- Сырой материал: [RAW_INPUT]
+
+Требования к работе:
+1. Пиши по-русски.
+2. Не делай маркетинговую воду. Нужен рабочий документ.
+3. Если есть технологические или продуктовые факты,
+   которые могут зависеть от текущего состояния инструментов,
+   явно отделяй:
+   - подтверждённые факты;
+   - предположения;
+   - open decisions.
+4. Если какая-то секция не нужна, не удаляй её, а пометь
+   "Не применимо" и коротко объясни почему.
+5. Пиши так, чтобы этот PRD можно было сразу скормить
+   AI-агенту / Codex без переписывания.
+6. Будь конкретным: схемы, контракты, тесты, acceptance
+   criteria, этапы разработки.
+7. Если продукту нужны scoring systems, pipelines,
+   jobs, background workers, rendering flows, auth,
+   subscription, billing, moderation, privacy, AI layers
+   или multi-step workflows — опиши это явно.
+8. Для software products всегда давай не только
+   product scope, но и execution-ready технический каркас.
+
+Выведи PRD в следующей структуре:
+
+# PRD — [PRODUCT_NAME]
+
+## 1. Product summary
+Коротко: что это за продукт, для кого, какой результат на выходе.
+
+## 2. Problem statement
+Какую проблему решаем и почему текущий процесс плох.
+
+## 3. Goals
+P0 / P1 / P2 цели.
+
+## 4. Non-goals
+Что в v1 сознательно не делаем.
+
+## 5. Primary users / personas
+Основной пользователь, вторичный пользователь, их контекст.
+
+## 6. Core user stories / JTBD
+Список ключевых сценариев.
+
+## 7. Product principles
+Какие правила должны определять продукт и реализацию.
+
+## 8. Scope of V1
+Что точно входит, что вне scope.
+
+## 9. Assumptions and constraints
+Технические, продуктовые, юридические, инфраструктурные
+ограничения и рабочие допущения.
+
+## 10. Proposed architecture
+Высокоуровневая архитектура:
+frontend / backend / workers / storage / AI providers /
+local vs cloud / integrations.
+
+## 11. Core workflows / pipelines
+Пошаговые пайплайны системы от входа до результата.
+
+## 12. Functional requirements
+Разбей по подсистемам.
+Для каждой подсистемы:
+- что делает;
+- входы;
+- выходы;
+- edge cases;
+- user-visible behavior.
+
+## 13. Internal decision systems
+Если применимо:
+scoring, ranking, routing, retries, quotas, guards,
+fallback modes, approval logic.
+
+## 14. Logical data model
+Сущности, связи, ключевые поля, индексы, статусы.
+
+## 15. Contracts
+API / IPC / events / queue payloads / LLM JSON schemas /
+render props / webhooks — что применимо проекту.
+Приведи пример request / response / payload.
+
+## 16. Security / privacy / permissions
+Секреты, sandbox, PII, storage policy, role model,
+internet access, audit trail.
+
+## 17. Non-functional requirements
+Performance, reliability, recovery, observability,
+portability, offline mode, scalability — если актуально.
+
+## 18. Acceptance criteria
+Чёткий список, по которому можно сказать:
+"v1 реально готов".
+
+## 19. Test strategy
+Unit / integration / e2e / smoke / golden / performance /
+negative tests — что нужно именно этому продукту.
+
+## 20. Suggested implementation breakdown
+Epic → задачи → dependency-safe порядок внедрения.
+
+## 21. Open decisions
+Что ещё требует продуктового или технического решения.
+
+## 22. First implementation slice
+Какой минимальный кусок системы лучше реализовать первым,
+чтобы быстро получить рабочий контур.
+
+Стиль ответа:
+- профессионально;
+- конкретно;
+- без воды;
+- с явным разделением фактов, предположений и решений;
+- так, чтобы документ был полезен и человеку, и AI-агенту.</pre>
+        <div class="prompt-fade"></div>
+      </div>
+      <div class="prompt-actions">
+        <button class="prompt-copy" data-target="prompt-1-text">Скопировать полный промпт</button>
+        <span class="prompt-meta">~110 строк · 22 секции PRD</span>
+      </div>
+      <div class="prompt-explanation">
+        <strong>Что делает:</strong> превращает сырое описание (голосовые, переписка, идея) в структурированный PRD из 22 разделов. На входе — переменные [PRODUCT_NAME], [TARGET_USERS], [RAW_INPUT]. На выходе — документ, который можно сразу отдать AI-агенту без переспросов.
+      </div>
+      <div class="page-number">07 / 18</div>
+    </section>
+
+    <!-- 08 — PROMPT 2: EXECUTION -->
+    <section class="slide slide--prompt" data-index="08">
+      <div class="brand">auto.ru бизнес</div>
+      <div class="nav-category">Этап Execution</div>
+      <div class="prompt-num">Промпт 2 из 4</div>
+      <h2 class="prompt-heading">Основной execution prompt</h2>
+      <div class="prompt-preview">
+        <pre class="prompt-text" id="prompt-2-text">From this message onward, work in execution mode.
+
+Read and follow these files as your operating instructions:
+- AGENTS.md
+- docs/PLAN.md
+- docs/STATUS.md
+- docs/TEST_PLAN.md
+- docs/BACKLOG.md
+
+Goal:
+Finish every unfinished task in docs/PLAN.md in dependency order.
+
+Execution loop:
+1. Select the first unfinished task whose dependencies are done.
+2. Gather only the minimum context required for that task.
+3. Implement that task with a scoped diff.
+4. Run the validation commands defined for that task.
+5. If validation fails, fix the issues and rerun validation
+   until green.
+6. Mark the task as done in docs/PLAN.md.
+7. Append a concise log entry to docs/STATUS.md:
+   - task finished
+   - key files changed
+   - commands run
+   - result
+   - next task
+8. Immediately continue to the next task without waiting
+   for my reply.
+
+Operating rules:
+- Do not stop after interim summaries.
+- Do not ask me to continue.
+- Do not spend turns on broad planning if the plan already exists.
+- Keep diffs scoped to the current task.
+- Do not do unrelated refactors.
+- Do not claim completion without passing validations.
+- Default to reasonable local assumptions and record them in
+  docs/STATUS.md.
+  Do not treat board sync as a blocker.
+- If GitHub board / issue sync fails, log it and continue.
+- Prefer working code, real tests, and real persistence over
+  placeholders or TODO-shaped completion.
+- If a task touches behavior, update or add tests accordingly.
+
+Stop only if:
+1. all tasks are done; or
+2. a real blocker remains after 3 repair attempts; or
+3. a secret / credential / manual action is required; or
+4. an action is irreversible and needs explicit approval.
+
+If blocked, output only:
+1. blocker
+2. what you tried
+3. exact command or failing check
+4. smallest action needed from me
+
+Begin now with the first unfinished task.</pre>
+        <div class="prompt-fade"></div>
+      </div>
+      <div class="prompt-actions">
+        <button class="prompt-copy" data-target="prompt-2-text">Скопировать полный промпт</button>
+        <span class="prompt-meta">~60 строк · execution loop</span>
+      </div>
+      <div class="prompt-explanation">
+        <strong>Что делает:</strong> переводит AI-агента в режим автономной работы по плану. Агент идёт milestone за milestone, валидирует каждый, обновляет STATUS.md и не останавливается на промежуточные «готово?». Останавливается только на реальном блокере, секретах или необратимом действии.
+      </div>
+      <div class="page-number">08 / 18</div>
+    </section>
+
+    <!-- 09 — PROMPT 3: RESUME -->
+    <section class="slide slide--prompt" data-index="09">
+      <div class="brand">auto.ru бизнес</div>
+      <div class="nav-category">Этап Resume</div>
+      <div class="prompt-num">Промпт 3 из 4</div>
+      <h2 class="prompt-heading">Continuation / resume</h2>
+      <div class="prompt-preview">
+        <pre class="prompt-text" id="prompt-3-text">Resume execution mode.
+
+Re-read and follow:
+- AGENTS.md
+- docs/PLAN.md
+- docs/STATUS.md
+- docs/TEST_PLAN.md
+- docs/BACKLOG.md
+
+Do not repeat finished work.
+Do not restart from the beginning.
+Use docs/PLAN.md and docs/STATUS.md to identify the exact next
+unfinished task and continue from there.
+
+Rules:
+- If the previous stop was caused by a failed validation,
+  start by fixing that failed validation, not by moving on.
+- If there are partial changes for the current task, finish
+  and validate them before switching tasks.
+- Keep diffs scoped.
+- Do not ask for permission to continue unless you hit a real
+  blocker as defined in AGENTS.md.
+- Continue task by task until all remaining tasks are done
+  or a real blocker is hit.
+
+If blocked, use the blocker format from AGENTS.md.
+Otherwise, continue immediately.</pre>
+        <div class="prompt-fade"></div>
+      </div>
+      <div class="prompt-actions">
+        <button class="prompt-copy" data-target="prompt-3-text">Скопировать полный промпт</button>
+        <span class="prompt-meta">~25 строк · возобновление</span>
+      </div>
+      <div class="prompt-explanation">
+        <strong>Что делает:</strong> возобновляет работу AI-агента после остановки или нового сеанса. Не переписывает план заново, не повторяет уже сделанные таски — читает STATUS.md и продолжает с точки остановки. Используется когда агент завис, чат закрыли, или нужно продолжить через час.
+      </div>
+      <div class="page-number">09 / 18</div>
+    </section>
+
+    <!-- 10 — PROMPT 4: HARDENING -->
+    <section class="slide slide--prompt" data-index="10">
+      <div class="brand">auto.ru бизнес</div>
+      <div class="nav-category">Этап Hardening</div>
+      <div class="prompt-num">Промпт 4 из 4</div>
+      <h2 class="prompt-heading">Review · repair · hardening</h2>
+      <div class="prompt-preview">
+        <pre class="prompt-text" id="prompt-4-text">Switch into review-and-repair mode.
+
+Your task is to harden the current implementation against the PRD,
+the plan, and the test plan before demo / release.
+
+Read and follow:
+- AGENTS.md
+- docs/PLAN.md
+- docs/STATUS.md
+- docs/TEST_PLAN.md
+- the PRD or spec file used by this project
+
+Audit process:
+1. Compare the current implementation against the PRD and plan.
+2. Identify:
+   - unfinished required behavior;
+   - weak spots in reliability;
+   - missing validations or tests;
+   - UX or developer-flow regressions;
+   - packaging / startup / migration / recovery risks.
+3. Triage findings by release risk.
+4. Fix the highest-risk gaps first.
+5. Run the relevant validation suite.
+6. Update docs/STATUS.md with:
+   - what was audited;
+   - what was fixed;
+   - what remains deferred and why;
+   - exact commands for final smoke-check.
+7. Continue until the current build is demo-ready or a real
+   blocker remains.
+
+Rules:
+- No speculative rewrites.
+- No new features unless they are required by the PRD.
+- Prefer reliability, correctness, and recoverability over
+  cleverness.
+- Do not stop after listing findings. Fix them.
+- Keep changes reviewable and scoped.
+
+Stop only when:
+- the build is demo-ready according to docs/TEST_PLAN.md; or
+- a real blocker remains after repair attempts.
+
+If blocked, use the blocker format from AGENTS.md.
+Otherwise, begin the audit and repair immediately.</pre>
+        <div class="prompt-fade"></div>
+      </div>
+      <div class="prompt-actions">
+        <button class="prompt-copy" data-target="prompt-4-text">Скопировать полный промпт</button>
+        <span class="prompt-meta">~50 строк · перед демо</span>
+      </div>
+      <div class="prompt-explanation">
+        <strong>Что делает:</strong> переключает агента в режим «довести до релиза». Сверяет реализацию с PRD и тест-планом, находит слабые места, чинит самые рисковые сначала. Не добавляет новых фич — закрывает дыры. Запускается перед демо, лайвом или релизом.
+      </div>
+      <div class="page-number">10 / 18</div>
+    </section>
+
+    <!-- 11 — SECTION III -->
+    <section class="slide slide--section" data-index="11">
+      <div class="brand">auto.ru бизнес</div>
+      <div>
+        <div class="section-category">Часть III</div>
+        <h1 class="section-heading">GitHub</h1>
+      </div>
+      <div class="section-footer">
+        <a class="deck-link" href="https://github.com" target="_blank" rel="noopener">github.com</a>
+      </div>
+      <div class="page-number">11 / 18</div>
+    </section>
+
+    <!-- 10 — FEATURE: GITHUB -->
+    <section class="slide slide--feature" data-index="12">
+      <div class="brand">auto.ru бизнес</div>
+      <div class="nav-category">GitHub</div>
+      <h2 class="feature-heading">Что умеет GitHub</h2>
+      <p class="feature-description">Четыре механизма, на которых держится совместная работа в репозитории.</p>
+      <div class="feature-points">
+        <div class="feature-point">
+          <div class="point-num">01</div>
+          <div class="point-title">Репозиторий</div>
+          <div class="point-desc">Облачная папка с файлами проекта и полной историей.</div>
+        </div>
+        <div class="feature-point">
+          <div class="point-num">02</div>
+          <div class="point-title">Коммиты</div>
+          <div class="point-desc">Снимки изменений: кто, что и когда поменял.</div>
+        </div>
+        <div class="feature-point">
+          <div class="point-num">03</div>
+          <div class="point-title">Ветки и Pull Request</div>
+          <div class="point-desc">Параллельные правки и ревью перед слиянием в основную версию.</div>
+        </div>
+        <div class="feature-point">
+          <div class="point-num">04</div>
+          <div class="point-title">Issues и Actions</div>
+          <div class="point-desc">Трекер задач и автозапуск проверок при каждом коммите.</div>
+        </div>
+      </div>
+      <div class="feature-mock">
+        <div class="mock-bar">
+          <div class="mock-dot"></div><div class="mock-dot"></div><div class="mock-dot"></div>
+        </div>
+<div class="mock-content"><strong>commerce-team/sales-playbook</strong>
+├── AGENTS.md          how AI works here
+├── docs/
+│   ├── PLAN.md        roadmap Q2 2026
+│   ├── STATUS.md      this week
+│   └── BACKLOG.md     ideas
+├── scripts/
+└── README.md
+
+last commit: <em>2 hours ago</em>
+contributors: 4</div>
+      </div>
+      <div class="feature-footer">
+        <a class="deck-link" href="https://github.com" target="_blank" rel="noopener">github.com</a>
+        <a class="deck-link" href="https://docs.github.com/en/get-started" target="_blank" rel="noopener">GitHub Docs — Quickstart</a>
+      </div>
+      <div class="page-number">12 / 18</div>
+    </section>
+
+    <!-- 13 — FEATURE: GITHUB для коммерции -->
+    <section class="slide slide--feature is-wide" data-index="13">
+      <div class="brand">auto.ru бизнес</div>
+      <div class="nav-category">GitHub</div>
+      <h2 class="feature-heading">Что это даёт коммерческому отделу</h2>
+      <p class="feature-description">Те же четыре механизма на языке менеджера: где живут материалы команды, как сохраняются изменения, как готовится новая версия и как ставятся задачи.</p>
+      <div class="feature-points">
+        <div class="feature-point">
+          <div class="point-num">01 · Репозиторий</div>
+          <div class="point-title">Единое место для всех материалов команды</div>
+          <div class="point-desc">Прайсы, скрипты звонков, шаблоны КП, инструкции для AI и регламенты лежат в одной структуре. Не нужно искать «актуальную» версию в чатах и почте — она всегда здесь.</div>
+          <div class="point-example">папка sales-playbook с актуальным прайсом и шаблоном письма для дилера</div>
+        </div>
+        <div class="feature-point">
+          <div class="point-num">02 · Коммиты</div>
+          <div class="point-title">Каждое изменение подписано и обратимо</div>
+          <div class="point-desc">Видно: кто поменял, что именно поменял и зачем. К версии прайса от прошлой недели можно вернуться за два клика — без копий «прайс_финал_v3.xlsx».</div>
+          <div class="point-example">«Иван, 14:32 — поднял минимальную скидку для региона ДВ на 2 п.п.»</div>
+        </div>
+        <div class="feature-point">
+          <div class="point-num">03 · Ветки и Pull Request</div>
+          <div class="point-title">Черновик правок с ревью руководителя</div>
+          <div class="point-desc">Готовите спецпредложение на ноябрь — работаете в отдельной «ветке», не трогая активный прайс. Руководитель видит все правки рядом со старой версией и одобряет их до публикации.</div>
+          <div class="point-example">ветка promo-november ждёт апрува РОПа, потом уезжает в основной прайс</div>
+        </div>
+        <div class="feature-point">
+          <div class="point-num">04 · Issues и Actions</div>
+          <div class="point-title">Задачи команды и автоматические проверки</div>
+          <div class="point-desc">Issues — список задач со сроком и ответственным («обновить скидку на октябрь»). Actions — робот, который при каждом изменении прайса сам проверяет, что цены не упали ниже минимальной маржи.</div>
+          <div class="point-example">issue #42 «пересчитать комиссию для топ-10 дилеров» — на Анне, до 5 ноября</div>
+        </div>
+      </div>
+      <div class="feature-footer">
+        <a class="deck-link" href="https://github.com" target="_blank" rel="noopener">github.com</a>
+        <a class="deck-link" href="https://docs.github.com/en/issues" target="_blank" rel="noopener">GitHub Docs — Issues</a>
+      </div>
+      <div class="page-number">13 / 18</div>
+    </section>
+
+    <!-- 14 — REPOS GALLERY -->
+    <section class="slide slide--repos" data-index="14">
+      <div class="brand">auto.ru бизнес</div>
+      <div class="nav-category">GitHub</div>
+      <h2 class="repos-heading">Готовые продукты в открытом доступе</h2>
+      <p class="repos-description">GitHub — это ещё и витрина. Целые продукты выкладывают исходники публично: можно посмотреть, скачать и запустить у себя. Шесть примеров, которые стоит знать.</p>
+      <div class="repos-grid">
+        <a class="repo-card" href="https://github.com/anthropics/claude-code" target="_blank" rel="noopener">
+          <div class="repo-handle">anthropics / claude-code</div>
+          <div class="repo-title">Claude Code</div>
+          <div class="repo-desc">CLI и SDK для работы с Claude в терминале — тот самый инструмент, на котором построен наш скилл АРБ.</div>
+          <div class="repo-meta">⭐ <strong>40k+</strong> · TypeScript · Anthropic</div>
+        </a>
+        <a class="repo-card" href="https://github.com/obra/superpowers" target="_blank" rel="noopener">
+          <div class="repo-handle">obra / superpowers</div>
+          <div class="repo-title">Superpowers</div>
+          <div class="repo-desc">Набор «навыков» для Claude Code: brainstorm, write-plan, TDD, debugging. Методология, по которой написан наш скилл.</div>
+          <div class="repo-meta">⭐ <strong>5k+</strong> · Markdown · Jesse Vincent</div>
+        </a>
+        <a class="repo-card" href="https://github.com/ItzCrazyKns/Perplexica" target="_blank" rel="noopener">
+          <div class="repo-handle">ItzCrazyKns / Perplexica</div>
+          <div class="repo-title">Perplexica</div>
+          <div class="repo-desc">Открытый аналог Perplexity. AI-поисковик, который работает локально, поддерживает OpenAI, Claude, Ollama.</div>
+          <div class="repo-meta">⭐ <strong>20k+</strong> · TypeScript · self-hosted</div>
+        </a>
+        <a class="repo-card" href="https://github.com/n8n-io/n8n" target="_blank" rel="noopener">
+          <div class="repo-handle">n8n-io / n8n</div>
+          <div class="repo-title">n8n</div>
+          <div class="repo-desc">Конструктор автоматизаций без кода: связки CRM, почты, AI, Telegram. Полезен для любых рутинных процессов отдела продаж.</div>
+          <div class="repo-meta">⭐ <strong>110k+</strong> · TypeScript · workflow</div>
+        </a>
+        <a class="repo-card" href="https://github.com/langgenius/dify" target="_blank" rel="noopener">
+          <div class="repo-handle">langgenius / dify</div>
+          <div class="repo-title">Dify</div>
+          <div class="repo-desc">Платформа, на которой собирают AI-приложения визуально: чат-боты, агенты, RAG поверх своих данных.</div>
+          <div class="repo-meta">⭐ <strong>90k+</strong> · TypeScript · AI apps</div>
+        </a>
+        <a class="repo-card" href="https://github.com/ollama/ollama" target="_blank" rel="noopener">
+          <div class="repo-handle">ollama / ollama</div>
+          <div class="repo-title">Ollama</div>
+          <div class="repo-desc">Запуск AI-моделей (Llama, Mistral, Qwen) на своём ноутбуке одной командой. Работает офлайн, без передачи данных в облако.</div>
+          <div class="repo-meta">⭐ <strong>140k+</strong> · Go · local AI</div>
+        </a>
+      </div>
+      <div class="repos-footer">
+        <a class="deck-link" href="https://github.com/trending" target="_blank" rel="noopener">github.com/trending — тренды дня</a>
+        <a class="deck-link" href="https://github.com/topics/artificial-intelligence" target="_blank" rel="noopener">topics/artificial-intelligence</a>
+      </div>
+      <div class="page-number">14 / 18</div>
+    </section>
+
+    <!-- 15 — SECTION IV -->
+    <section class="slide slide--section" data-index="15">
+      <div class="brand">auto.ru бизнес</div>
+      <div>
+        <div class="section-category">Часть IV</div>
+        <h1 class="section-heading">API и MCP</h1>
+      </div>
+      <div class="page-number">15 / 18</div>
+    </section>
+
+    <!-- 12 — COMPARE -->
+    <section class="slide slide--compare" data-index="16">
+      <div class="brand">auto.ru бизнес</div>
+      <div class="nav-category">Интеграции</div>
+      <div class="compare-category">Сравнение</div>
+      <h2 class="compare-heading">Два способа подключить инструменты</h2>
+      <div class="compare-grid">
+        <div class="compare-col">
+          <div class="col-label">Способ 1</div>
+          <div class="col-title">API</div>
+          <div class="col-desc">Наш код вызывает чужой сервис по HTTP. Работает в продукте, не в чате.</div>
+          <div class="col-when"><strong>Когда:</strong> встраиваем функцию в свой продукт.</div>
+        </div>
+        <div class="compare-col">
+          <div class="col-label">Способ 2</div>
+          <div class="col-title">MCP</div>
+          <div class="col-desc">AI получает «руки» — список инструментов, которыми пользуется сам в чате.</div>
+          <div class="col-when"><strong>Когда:</strong> AI работает с CRM, браузером, файлами.</div>
+        </div>
+      </div>
+      <div class="compare-footer">
+        <a class="deck-link" href="https://modelcontextprotocol.io" target="_blank" rel="noopener">Model Context Protocol</a>
+        <a class="deck-link" href="https://github.com/modelcontextprotocol/servers" target="_blank" rel="noopener">Каталог MCP-серверов</a>
+        <a class="deck-link" href="https://www.anthropic.com/api" target="_blank" rel="noopener">Anthropic API</a>
+      </div>
+      <div class="page-number">16 / 18</div>
+    </section>
+
+    <!-- 13 — FEATURE: CHROME DEVTOOLS MCP -->
+    <section class="slide slide--feature" data-index="17">
+      <div class="brand">auto.ru бизнес</div>
+      <div class="nav-category">MCP</div>
+      <h2 class="feature-heading">Chrome DevTools для коммерции</h2>
+      <p class="feature-description">AI получает доступ к браузеру и работает руками за вас. Каждое действие подтверждаете вы.</p>
+      <div class="feature-points">
+        <div class="feature-point">
+          <div class="point-num">01</div>
+          <div class="point-title">Выгрузка из CRM</div>
+          <div class="point-desc">Открывает Битрикс, копирует лидов, отдаёт Excel.</div>
+        </div>
+        <div class="feature-point">
+          <div class="point-num">02</div>
+          <div class="point-title">Скриншоты сайтов</div>
+          <div class="point-desc">Главные страницы конкурентов в одном размере.</div>
+        </div>
+        <div class="feature-point">
+          <div class="point-num">03</div>
+          <div class="point-title">Заполнение форм</div>
+          <div class="point-desc">AI читает Excel и переносит в веб-форму.</div>
+        </div>
+        <div class="feature-point">
+          <div class="point-num">04</div>
+          <div class="point-title">Глазами клиента</div>
+          <div class="point-desc">Эмуляция iPhone, регион Москва, проверка оплаты.</div>
+        </div>
+      </div>
+      <div class="feature-mock">
+        <div class="mock-bar">
+          <div class="mock-dot"></div><div class="mock-dot"></div><div class="mock-dot"></div>
+        </div>
+<div class="mock-content">— Открой crm.auto.ru, выгрузи лиды за неделю.
+
+<em>✓</em> Открыл вкладку
+<em>✓</em> Авторизовался
+<em>✓</em> Перешёл в раздел Лиды
+<em>✓</em> Применил фильтр: дата ≥ 22 апреля
+<em>✓</em> Скопировал 47 строк
+<em>✓</em> Сохранил в leads-week.xlsx
+
+<strong>Готово.</strong> Подтверждение каждого шага — в логе.</div>
+      </div>
+      <div class="feature-footer">
+        <a class="deck-link" href="https://github.com/ChromeDevTools/chrome-devtools-mcp" target="_blank" rel="noopener">Chrome DevTools MCP</a>
+        <a class="deck-link" href="https://docs.anthropic.com/claude/docs/computer-use" target="_blank" rel="noopener">Computer Use docs</a>
+      </div>
+      <div class="page-number">17 / 18</div>
+    </section>
+
+    <!-- 16 — DISCUSS -->
+    <section class="slide slide--discuss" data-index="18">
+      <div class="brand">auto.ru бизнес</div>
+      <h2 class="discuss-heading">Обсудим что попробуем</h2>
+      <div class="discuss-meta">Команда коммерции · 30 апреля 2026</div>
+      <div class="page-number">18 / 18</div>
+    </section>
+
+  </main>
+
+  <div class="deck-hint">← → · Space · 1—9 · клик</div>
+
+  <script>
+  (function() {
+    const slides = Array.from(document.querySelectorAll('.slide'));
+    const total = slides.length;
+
+    function activate(idx) {
+      if (idx < 0 || idx >= total) return;
+      slides.forEach((s, i) => s.classList.toggle('is-active', i === idx));
+      const dataIndex = slides[idx].dataset.index;
+      history.replaceState(null, '', '#' + dataIndex);
+    }
+
+    function currentIndex() {
+      return slides.findIndex(s => s.classList.contains('is-active'));
+    }
+
+    function nextSlide() { activate(Math.min(currentIndex() + 1, total - 1)); }
+    function prevSlide() { activate(Math.max(currentIndex() - 1, 0)); }
+
+    document.addEventListener('keydown', (e) => {
+      if (e.target.tagName === 'INPUT' || e.target.tagName === 'TEXTAREA') return;
+      if (e.key === 'ArrowRight') { e.preventDefault(); nextSlide(); }
+      else if (e.key === 'ArrowLeft') { e.preventDefault(); prevSlide(); }
+      else if (e.key === ' ') { e.preventDefault(); e.shiftKey ? prevSlide() : nextSlide(); }
+      else if (e.key === 'PageDown') { e.preventDefault(); nextSlide(); }
+      else if (e.key === 'PageUp') { e.preventDefault(); prevSlide(); }
+      else if (e.key === 'Home') { e.preventDefault(); activate(0); }
+      else if (e.key === 'End') { e.preventDefault(); activate(total - 1); }
+      else if (/^[1-9]$/.test(e.key)) {
+        const target = parseInt(e.key, 10) - 1;
+        if (target < total) activate(target);
+      }
+    });
+
+    document.addEventListener('click', (e) => {
+      if (e.target.closest('a')) return;
+      if (e.target.closest('.deck-hint')) return;
+      if (e.target.closest('.prompt-copy')) return;
+      if (e.target.closest('.prompt-preview')) return;
+      const half = window.innerWidth / 2;
+      if (e.clientX > half) nextSlide(); else prevSlide();
+    });
+
+    document.querySelectorAll('.prompt-copy').forEach((btn) => {
+      btn.addEventListener('click', async (e) => {
+        e.stopPropagation();
+        const targetId = btn.dataset.target;
+        const node = document.getElementById(targetId);
+        if (!node) return;
+        const text = node.textContent;
+        try {
+          await navigator.clipboard.writeText(text);
+        } catch (err) {
+          const ta = document.createElement('textarea');
+          ta.value = text; document.body.appendChild(ta);
+          ta.select(); document.execCommand('copy'); ta.remove();
+        }
+        const orig = btn.textContent;
+        btn.classList.add('is-copied');
+        btn.textContent = 'Скопировано';
+        setTimeout(() => { btn.classList.remove('is-copied'); btn.textContent = orig; }, 1800);
+      });
+    });
+
+    window.addEventListener('hashchange', () => {
+      const hash = location.hash.replace('#', '');
+      const idx = slides.findIndex(s => s.dataset.index === hash);
+      if (idx >= 0) activate(idx);
+    });
+
+    const initialHash = location.hash.replace('#', '');
+    if (initialHash) {
+      const idx = slides.findIndex(s => s.dataset.index === initialHash);
+      if (idx >= 0) activate(idx);
+    }
+  })();
+  </script>
+</body>
+</html>
